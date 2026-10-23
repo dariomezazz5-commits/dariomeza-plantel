@@ -3,17 +3,23 @@
   <header class="page-header page-header-split">
     <div class="page-header-text">
       <div class="overline" id="colaboradores_conteo"><%= render "conteo" %></div>
-      <h1>Colaboradores</h1>
+      <h1><%= usuario_actual.jefatura? ? "Mi equipo" : "Colaboradores" %></h1>
     </div>
-    <div class="search">
-      <%= icono :search, size: 16, class: "search-icon" %>
-      <%= f.search_field :q, value: @q, class: "input", placeholder: "Buscar por nombre, cargo o RUT",
-            autocomplete: "off", "aria-label": "Buscar colaboradores", data: { action: "input->filtro#buscar" } %>
+    <div class="header-tools">
+      <div class="search">
+        <%= icono :search, size: 16, class: "search-icon" %>
+        <%= f.search_field :q, value: @q, class: "input", placeholder: "Buscar por nombre, cargo o RUT",
+              autocomplete: "off", "aria-label": "Buscar colaboradores", data: { action: "input->filtro#buscar" } %>
+      </div>
+      <% if usuario_actual.admin? %>
+        <%= link_to new_importacion_path, class: "btn btn-secondary" do %><%= icono :upload, size: 16 %> Importar<% end %>
+        <%= link_to new_colaborador_path, class: "btn btn-primary" do %><%= icono :plus, size: 16 %> Nuevo<% end %>
+      <% end %>
     </div>
   </header>
 
   <div class="chips" role="radiogroup" aria-label="Filtrar por área">
-    <% [ "Todas", *Colaborador::AREAS ].each do |area| %>
+    <% [ "Todas", *@areas ].each do |area| %>
       <label class="chip">
         <%= f.radio_button :area, area, checked: @area == area %>
         <%= area %>

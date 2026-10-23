@@ -1,0 +1,7 @@
+Hola <%= @solicitud.colaborador.nombre_pila %>,
+
+Tu solicitud de <%= @solicitud.tipo.downcase %> del <%= l(@solicitud.desde, format: :corto) %> al <%= l(@solicitud.hasta, format: :corto) %> fue <%= @solicitud.estado.downcase %><%= " por #{@solicitud.resuelta_por.nombre}" if @solicitud.resuelta_por %>.
+<% if @solicitud.estado == "Aprobada" && @solicitud.vacaciones? %>
+Tu saldo de vacaciones quedó en <%= @solicitud.colaborador.saldo_vacaciones %> días.
+<% end %>
+Ver mis ausencias: <%= ausencias_url %>

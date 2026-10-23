@@ -1,17 +1,17 @@
 <div class="page">
   <header class="page-header">
     <div class="overline"><%= fecha_larga %></div>
-    <h1><%= saludo %>, <%= usuario_actual&.nombre_pila %></h1>
+    <h1><%= saludo %>, <%= usuario_actual.nombre_pila %></h1>
   </header>
 
   <% ausentes = @colaboradores.reject(&:activo?) %>
   <% kpis = [
-       [ "Dotación activa", @colaboradores.size, "#{@colaboradores.map(&:sede).uniq.size} sedes" ],
+       [ (usuario_actual.jefatura? ? "Mi equipo" : "Dotación activa"), @colaboradores.size, "#{@colaboradores.map(&:sede).uniq.size} #{@colaboradores.map(&:sede).uniq.size == 1 ? 'sede' : 'sedes'}" ],
        [ "Solicitudes por aprobar", @pendientes.size, nota_mes(@pendientes.map(&:desde)) ],
        [ "Ausentes hoy", ausentes.size, ausentes.group_by(&:estado).map { |e, l| "#{l.size} #{e == 'Licencia médica' ? 'licencia' : e.downcase}" }.join(" · ").presence || "nadie" ],
-       [ "Próximos ingresos", @ingresos.size, nota_mes(@ingresos.map(&:fecha), prefijo: "en") ]
-     ] %>
-  <div class="blueprint kpi-strip">
+       ([ "Próximos ingresos", @ingresos.size, nota_mes(@ingresos.map(&:fecha), prefijo: "en") ] if usuario_actual.admin?)
+     ].compact %>
+  <div class="blueprint kpi-strip" style="grid-template-columns: repeat(<%= kpis.size %>, minmax(0, 1fr))">
     <%= esquinas %>
     <% kpis.each do |label, value, note| %>
       <div class="kpi">
@@ -52,9 +52,8 @@
       <section class="blueprint panel">
         <%= esquinas %>
         <h3>Dotación por área</h3>
-        <% max = @dotacion.values.max.to_f %>
-        <% Colaborador::AREAS.each do |area| %>
-          <% n = @dotacion.fetch(area, 0) %>
+        <% max = @dotacion.map(&:last).max.to_f %>
+        <% @dotacion.each do |area, n| %>
           <div class="bar-row">
             <span><%= area %></span>
             <div class="bar-track"><div class="bar-fill" style="width: <%= max.zero? ? 0 : (n / max * 100).round(2) %>%"></div></div>
@@ -63,6 +62,7 @@
         <% end %>
       </section>
 
+      <% if usuario_actual.admin? %>
       <section class="blueprint panel panel-tight">
         <%= esquinas %>
         <h3>Próximos ingresos</h3>
@@ -77,6 +77,7 @@
           </div>
         <% end %>
       </section>
+      <% end %>
     </div>
   </div>
 </div>

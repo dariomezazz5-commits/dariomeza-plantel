@@ -13,8 +13,9 @@
 
       <div class="field">
         <%= f.label :colaborador_id, "Colaborador" %>
-        <%= f.collection_select :colaborador_id, Colaborador.order(:id), :id, :nombre,
-              { prompt: "Selecciona…" }, class: "input", data: { solicitud_form_target: "colaborador", overlay_target: "focus" } %>
+        <% opciones = usuario_actual.colaboradores_visibles.order(:nombre) %>
+        <%= f.collection_select :colaborador_id, opciones, :id, :nombre,
+              { prompt: (opciones.size > 1 ? "Selecciona…" : nil) }, class: "input", data: { solicitud_form_target: "colaborador", overlay_target: "focus" } %>
       </div>
       <div class="field">
         <%= f.label :tipo, "Tipo" %>

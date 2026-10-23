@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+  <head>
+    <title><%= content_for(:title) || "Ingresar · Plantel" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&display=swap">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="auth-body">
+    <main class="auth-wrap">
+      <div class="auth-brand">
+        <div class="auth-brand-name">Plantel</div>
+        <div class="auth-brand-sub">Gestión de personas</div>
+      </div>
+      <section class="auth-card blueprint">
+        <%= esquinas %>
+        <%= render "shared/flash" %>
+        <%= yield %>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+Recibimos una solicitud para restablecer tu contraseña de Plantel.
+
+Elige una nueva contraseña aquí: <%= edit_password_url(@user.password_reset_token) %>
+
+El enlace vence en <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>. Si no lo pediste, ignora este correo.

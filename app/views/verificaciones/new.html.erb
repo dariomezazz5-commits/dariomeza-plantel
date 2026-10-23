@@ -1,0 +1,10 @@
+<h1 class="auth-title">Verificación en dos pasos</h1>
+<p class="auth-text">Abre tu app autenticadora (Google Authenticator, Microsoft Authenticator, 1Password…) y escribe el código de 6 dígitos de Plantel.</p>
+<%= form_with url: verificacion_path, class: "form-stack" do |form| %>
+  <div class="field">
+    <%= form.label :codigo, "Código" %>
+    <%= form.text_field :codigo, required: true, autofocus: true, autocomplete: "one-time-code", inputmode: "numeric", pattern: "[0-9 ]{6,7}", maxlength: 7, class: "input input-code" %>
+  </div>
+  <%= form.submit "Verificar", class: "btn btn-primary btn-block" %>
+<% end %>
+<%= link_to "Volver", new_session_path, class: "auth-link" %>

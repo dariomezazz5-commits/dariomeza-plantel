@@ -41,7 +41,16 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  # En Codespaces los enlaces de los correos apuntan a la URL pública reenviada.
+  config.action_mailer.default_url_options =
+    if ENV["CODESPACE_NAME"]
+      { host: "#{ENV['CODESPACE_NAME']}-3000.#{ENV.fetch('GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN', 'app.github.dev')}", protocol: "https" }
+    else
+      { host: "localhost", port: 3000 }
+    end
+
+  # Los correos no se envían: se ven en /letter_opener
+  config.action_mailer.delivery_method = :letter_opener_web
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

@@ -1,0 +1,13 @@
+<h1 class="auth-title">Elige tu contraseña</h1>
+<p class="auth-text">Para <strong><%= @user.email_address %></strong>. Usa al menos 10 caracteres.</p>
+<%= form_with url: password_path(params[:token]), method: :put, class: "form-stack" do |form| %>
+  <div class="field">
+    <%= form.label :password, "Nueva contraseña" %>
+    <%= form.password_field :password, required: true, autofocus: true, autocomplete: "new-password", minlength: 10, maxlength: 72, class: "input" %>
+  </div>
+  <div class="field">
+    <%= form.label :password_confirmation, "Repítela" %>
+    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", minlength: 10, maxlength: 72, class: "input" %>
+  </div>
+  <%= form.submit "Guardar contraseña", class: "btn btn-primary btn-block" %>
+<% end %>

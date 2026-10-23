@@ -16,15 +16,31 @@ es:
   activerecord:
     models:
       solicitud: Solicitud
+      colaborador: Colaborador
+      user: Usuario
     attributes:
+      colaborador:
+        nombre: Nombre
+        rut: RUT
+        email: Correo
+        cargo: Cargo
+        area: Área
+        sede: Sede
+        ingreso: Fecha de ingreso
+        contrato: Contrato
+        estado: Estado
+        saldo_vacaciones: Saldo de vacaciones
+        jefe: Jefatura
+      user:
+        email_address: Correo
+        password: Contraseña
+        password_confirmation: Confirmación de contraseña
+        rol: Rol
+        colaborador: Colaborador
       solicitud:
         colaborador: Colaborador
         tipo: Tipo
         desde: Desde
         hasta: Hasta
   errors:
-    messages:
-      blank: no puede estar vacío
-      inclusion: no es válido
-      required: es obligatorio
     format: "%{attribute} %{message}"

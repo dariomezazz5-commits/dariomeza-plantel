@@ -1,0 +1,43 @@
+<div class="page page-18">
+  <header class="page-header page-header-split">
+    <div class="page-header-text">
+      <div class="overline">Quién hizo qué y cuándo · <%= usuario_actual.empresa.nombre %></div>
+      <h1>Auditoría</h1>
+    </div>
+    <%= form_with url: auditoria_path, method: :get, class: "header-tools", data: { controller: "filtro", action: "change->filtro#submit" } do |f| %>
+      <%= f.select :accion, options_for_select(RegistroAuditoria::ACCIONES.invert, @accion), { include_blank: "Todas las acciones" },
+            class: "input", "aria-label": "Filtrar por acción" %>
+    <% end %>
+  </header>
+
+  <div class="table-scroll">
+    <table class="table" style="min-width: 760px">
+      <thead><tr><th>Fecha</th><th>Persona</th><th>Acción</th><th>Detalle</th><th>IP</th></tr></thead>
+      <tbody>
+        <% if @registros.empty? %>
+          <tr><td colspan="5" class="empty">Todavía no hay registros.</td></tr>
+        <% end %>
+        <% @registros.each do |r| %>
+          <tr>
+            <td class="nowrap num"><%= l(r.created_at, format: "%d-%m-%Y %H:%M") %></td>
+            <td><%= r.user&.nombre || "Sistema" %></td>
+            <td><span class="tag tag-neutral"><%= r.accion_legible %></span></td>
+            <td>
+              <%= r.descripcion %>
+              <% cambios = r.cambios.select { |_, v| v.is_a?(Array) && v.size == 2 } %>
+              <% if cambios.any? %>
+                <div class="meta"><%= cambios.map { |k, (a, b)| "#{k.humanize}: #{a.presence || '—'} → #{b.presence || '—'}" }.join(" · ") %></div>
+              <% end %>
+            </td>
+            <td class="meta"><%= r.ip_address %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pager">
+    <% if @pagina > 1 %><%= link_to "← Más recientes", auditoria_path(accion: @accion, pagina: @pagina - 1), class: "btn btn-secondary" %><% end %>
+    <% if @hay_mas %><%= link_to "Anteriores →", auditoria_path(accion: @accion, pagina: @pagina + 1), class: "btn btn-secondary" %><% end %>
+  </div>
+</div>
