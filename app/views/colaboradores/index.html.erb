@@ -1,0 +1,25 @@
+<%= form_with url: colaboradores_path, method: :get, class: "page page-18",
+      data: { turbo_stream: true, controller: "filtro", action: "change->filtro#submit" } do |f| %>
+  <header class="page-header page-header-split">
+    <div class="page-header-text">
+      <div class="overline" id="colaboradores_conteo"><%= render "conteo" %></div>
+      <h1>Colaboradores</h1>
+    </div>
+    <div class="search">
+      <%= icono :search, size: 16, class: "search-icon" %>
+      <%= f.search_field :q, value: @q, class: "input", placeholder: "Buscar por nombre, cargo o RUT",
+            autocomplete: "off", "aria-label": "Buscar colaboradores", data: { action: "input->filtro#buscar" } %>
+    </div>
+  </header>
+
+  <div class="chips" role="radiogroup" aria-label="Filtrar por área">
+    <% [ "Todas", *Colaborador::AREAS ].each do |area| %>
+      <label class="chip">
+        <%= f.radio_button :area, area, checked: @area == area %>
+        <%= area %>
+      </label>
+    <% end %>
+  </div>
+
+  <%= render "resultados" %>
+<% end %>

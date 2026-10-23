@@ -1,0 +1,40 @@
+<div class="dialog-backdrop" data-controller="overlay" data-action="click->overlay#closeOnBackdrop keydown.esc@window->overlay#close">
+  <div class="dialog blueprint" role="dialog" aria-modal="true" aria-labelledby="dialogo-titulo">
+    <%= esquinas %>
+    <div class="dialog-title" id="dialogo-titulo">Nueva solicitud de ausencia</div>
+
+    <%= form_with model: solicitud, url: solicitudes_path, class: "dialog-form",
+          data: { turbo_frame: "_top", controller: "solicitud-form",
+                  solicitud_form_feriados_value: DiasHabiles.feriados.map(&:iso8601).to_json,
+                  action: "input->solicitud-form#actualizar change->solicitud-form#actualizar" } do |f| %>
+      <% if solicitud.errors.any? %>
+        <div class="form-errors" role="alert"><%= solicitud.errors.full_messages.to_sentence %></div>
+      <% end %>
+
+      <div class="field">
+        <%= f.label :colaborador_id, "Colaborador" %>
+        <%= f.collection_select :colaborador_id, Colaborador.order(:id), :id, :nombre,
+              { prompt: "Selecciona…" }, class: "input", data: { solicitud_form_target: "colaborador", overlay_target: "focus" } %>
+      </div>
+      <div class="field">
+        <%= f.label :tipo, "Tipo" %>
+        <%= f.select :tipo, Solicitud::TIPOS, {}, class: "input" %>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <%= f.label :desde, "Desde" %>
+          <%= f.date_field :desde, class: "input", data: { solicitud_form_target: "desde" } %>
+        </div>
+        <div class="field">
+          <%= f.label :hasta, "Hasta" %>
+          <%= f.date_field :hasta, class: "input", data: { solicitud_form_target: "hasta" } %>
+        </div>
+      </div>
+      <div class="form-summary" data-solicitud-form-target="resumen" aria-live="polite"></div>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" data-action="overlay#close">Cancelar</button>
+        <%= f.submit "Crear solicitud", class: "btn btn-primary", data: { solicitud_form_target: "submit" } %>
+      </div>
+    <% end %>
+  </div>
+</div>

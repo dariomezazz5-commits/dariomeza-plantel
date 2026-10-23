@@ -1,0 +1,25 @@
+camila:
+  nombre: Camila Rojas Fuentes
+  cargo: Jefa de Personas
+  area: Personas
+  sede: Santiago
+  ingreso: 2019-03-04
+  contrato: Indefinido
+  rut: 14.238.917-3
+  email: crojas@industriasandes.cl
+  jefatura: Gerencia General
+  saldo_vacaciones: 11
+  estado: Activo
+
+valentina:
+  nombre: Valentina Muñoz Díaz
+  cargo: Ingeniera de Procesos
+  area: Operaciones
+  sede: Concepción
+  ingreso: 2020-01-13
+  contrato: Indefinido
+  rut: 17.445.208-K
+  email: vmunoz@industriasandes.cl
+  jefatura: Benjamín Contreras
+  saldo_vacaciones: 17
+  estado: Activo

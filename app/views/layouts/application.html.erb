@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+  <head>
+    <title><%= content_for(:title) || "Plantel · Gestión de personas" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="application-name" content="Plantel">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= turbo_refresh_method_tag :morph %>
+    <%= turbo_refresh_scroll_tag :preserve %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&display=swap">
+
+    <%= yield :head %>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-name">Plantel</div>
+          <div class="brand-sub">Industrias Andes SpA</div>
+        </div>
+        <nav class="nav">
+          <%= nav_item "Inicio", root_path, :house, activo: controller_name == "inicio" %>
+          <%= nav_item "Colaboradores", colaboradores_path, :users, activo: controller_name == "colaboradores" %>
+          <%= nav_item "Ausencias", ausencias_path, :calendar, activo: controller_name == "solicitudes" do %>
+            <% if pendientes_count > 0 %><span class="nav-badge"><%= pendientes_count %></span><% end %>
+          <% end %>
+        </nav>
+        <div class="sidebar-user">
+          <span class="avatar avatar-user"><%= usuario_actual&.iniciales %></span>
+          <div class="sidebar-user-text">
+            <span><%= usuario_actual&.nombre_corto %></span>
+            <span class="muted-accent"><%= usuario_actual&.cargo %></span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <%= yield %>
+      </main>
+    </div>
+
+    <%# Ficha lateral de colaborador: los enlaces con data-turbo-frame="drawer" cargan colaboradores#show aquí. %>
+    <%= turbo_frame_tag "drawer", src: (colaborador_path(params[:ficha]) if params[:ficha].present?) %>
+  </body>
+</html>

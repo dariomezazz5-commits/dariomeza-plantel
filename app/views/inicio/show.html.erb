@@ -1,0 +1,82 @@
+<div class="page">
+  <header class="page-header">
+    <div class="overline"><%= fecha_larga %></div>
+    <h1><%= saludo %>, <%= usuario_actual&.nombre_pila %></h1>
+  </header>
+
+  <% ausentes = @colaboradores.reject(&:activo?) %>
+  <% kpis = [
+       [ "Dotación activa", @colaboradores.size, "#{@colaboradores.map(&:sede).uniq.size} sedes" ],
+       [ "Solicitudes por aprobar", @pendientes.size, nota_mes(@pendientes.map(&:desde)) ],
+       [ "Ausentes hoy", ausentes.size, ausentes.group_by(&:estado).map { |e, l| "#{l.size} #{e == 'Licencia médica' ? 'licencia' : e.downcase}" }.join(" · ").presence || "nadie" ],
+       [ "Próximos ingresos", @ingresos.size, nota_mes(@ingresos.map(&:fecha), prefijo: "en") ]
+     ] %>
+  <div class="blueprint kpi-strip">
+    <%= esquinas %>
+    <% kpis.each do |label, value, note| %>
+      <div class="kpi">
+        <span class="kpi-label"><%= label %></span>
+        <span class="kpi-value"><%= value %></span>
+        <span class="kpi-note"><%= note %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="dash-grid">
+    <section class="blueprint panel">
+      <%= esquinas %>
+      <div class="panel-head">
+        <h3>Solicitudes por aprobar</h3>
+        <%= link_to "Ver todas", ausencias_path, class: "btn btn-ghost" %>
+      </div>
+      <% if @pendientes.empty? %>
+        <p class="empty">No hay solicitudes pendientes.</p>
+      <% end %>
+      <% @pendientes.each do |s| %>
+        <div class="pending-row">
+          <%= link_to colaborador_path(s.colaborador), class: "avatar-link", data: { turbo_frame: "drawer" }, "aria-label": "Ver ficha de #{s.colaborador.nombre_corto}" do %>
+            <%= avatar s.colaborador.iniciales, size: 34 %>
+          <% end %>
+          <div class="pending-text">
+            <span class="name"><%= s.colaborador.nombre_corto %></span>
+            <span class="meta"><%= s.tipo %> · <%= rango_fechas(s.desde, s.hasta) %> · <%= DiasHabiles.etiqueta(s.dias_habiles) %></span>
+          </div>
+          <div class="actions">
+            <%= render "solicitudes/acciones", solicitud: s %>
+          </div>
+        </div>
+      <% end %>
+    </section>
+
+    <div class="stack-28">
+      <section class="blueprint panel">
+        <%= esquinas %>
+        <h3>Dotación por área</h3>
+        <% max = @dotacion.values.max.to_f %>
+        <% Colaborador::AREAS.each do |area| %>
+          <% n = @dotacion.fetch(area, 0) %>
+          <div class="bar-row">
+            <span><%= area %></span>
+            <div class="bar-track"><div class="bar-fill" style="width: <%= max.zero? ? 0 : (n / max * 100).round(2) %>%"></div></div>
+            <span class="num"><%= n %></span>
+          </div>
+        <% end %>
+      </section>
+
+      <section class="blueprint panel panel-tight">
+        <%= esquinas %>
+        <h3>Próximos ingresos</h3>
+        <% if @ingresos.empty? %><p class="empty">Sin ingresos programados.</p><% end %>
+        <% @ingresos.each do |i| %>
+          <div class="ingreso-row">
+            <div class="two-line">
+              <span class="name"><%= i.nombre %></span>
+              <span class="meta"><%= i.cargo %> · <%= i.area %></span>
+            </div>
+            <span class="ingreso-fecha"><%= dia_mes(i.fecha) %></span>
+          </div>
+        <% end %>
+      </section>
+    </div>
+  </div>
+</div>

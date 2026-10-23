@@ -1,0 +1,60 @@
+<div class="page page-22">
+  <header class="page-header page-header-split">
+    <div class="page-header-text">
+      <div class="overline"><%= l(Date.current.next_month, format: :mes).upcase_first %> · <%= pendientes_count %> por aprobar</div>
+      <h1>Ausencias</h1>
+    </div>
+    <%= link_to new_solicitud_path, class: "btn btn-primary btn-cta blueprint", data: { turbo_frame: "modal" } do %>
+      <%= esquinas %><%= icono :plus, size: 16 %> Nueva solicitud
+    <% end %>
+  </header>
+
+  <div class="stack-16">
+    <nav class="seg" aria-label="Filtrar solicitudes">
+      <% [ [ "pend", "Por aprobar (#{pendientes_count})" ], [ "done", "Resueltas" ], [ "all", "Todas" ] ].each do |id, label| %>
+        <%= link_to label, ausencias_path(tab: id), class: [ "seg-item", ("is-active" if @tab == id) ], "aria-current": (@tab == id ? "page" : nil) %>
+      <% end %>
+    </nav>
+
+    <div class="table-scroll">
+      <table class="table" style="min-width: 820px">
+        <thead>
+          <tr><th>Colaborador</th><th>Tipo</th><th>Período</th><th>Días hábiles</th><th>Estado</th><th class="right">Acciones</th></tr>
+        </thead>
+        <tbody>
+          <% if @solicitudes.empty? %>
+            <tr><td colspan="6" class="empty">No hay solicitudes en esta vista.</td></tr>
+          <% end %>
+          <% @solicitudes.each do |s| %>
+            <tr id="<%= dom_id(s) %>">
+              <td>
+                <%= link_to colaborador_path(s.colaborador), class: "person-cell", data: { turbo_frame: "drawer" } do %>
+                  <%= avatar s.colaborador.iniciales, size: 30 %>
+                  <span class="two-line">
+                    <span class="name"><%= s.colaborador.nombre_corto %></span>
+                    <span class="meta"><%= s.colaborador.area %></span>
+                  </span>
+                <% end %>
+              </td>
+              <td><%= s.tipo %></td>
+              <td class="nowrap"><%= rango_fechas(s.desde, s.hasta) %></td>
+              <td class="num"><%= s.dias_habiles %></td>
+              <td><span class="<%= estado_solicitud_class(s.estado) %>"><%= s.estado %></span></td>
+              <td class="right">
+                <% if s.pendiente? %>
+                  <div class="actions"><%= render "solicitudes/acciones", solicitud: s %></div>
+                <% elsif @resueltas_en_sesion.include?(s.id) %>
+                  <%= button_to "Deshacer", deshacer_solicitud_path(s), method: :patch, class: "btn btn-ghost", form_class: "inline-form" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%= turbo_frame_tag "modal" do %>
+  <%= render "solicitudes/dialogo", solicitud: @nueva_solicitud if @nueva_solicitud %>
+<% end %>
