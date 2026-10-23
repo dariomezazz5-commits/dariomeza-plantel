@@ -10,7 +10,13 @@ Stack: Rails 8.1, SQLite, Propshaft, Importmap, Turbo y Stimulus (sin build de J
 
 En el repositorio: **Code → Codespaces → Create codespace on main**. El contenedor instala las gemas,
 crea la base con los datos de ejemplo y levanta el servidor; cuando aparezca el aviso del puerto 3000,
-haz clic en **Open in Browser**. Si el servidor no partió solo: `bin/rails server`.
+haz clic en **Open in Browser**.
+
+Si no ves la app:
+- La primera creación tarda 3–5 minutos; espera a que la terminal muestre `Listening on http://0.0.0.0:3000`.
+- Si el servidor no partió solo, en la terminal: `bin/rails server -b 0.0.0.0`.
+- Abre la app desde la pestaña **PORTS** → puerto 3000 → ícono 🌐 (la URL termina en `.app.github.dev`).
+  No uses `localhost:3000` en tu navegador: la app corre en la máquina de GitHub, no en tu computador.
 
 ## Puesta en marcha local
 
