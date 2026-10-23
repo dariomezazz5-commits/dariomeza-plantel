@@ -1,0 +1,7 @@
+Hola <%= @user.nombre_pila %>,
+
+<%= @user.empresa.nombre %> te dio acceso a Plantel con el rol <%= @user.rol_legible %>.
+
+Elige tu contraseña aquí: <%= edit_password_url(@user.password_reset_token) %>
+
+Tu usuario es <%= @user.email_address %>. El enlace vence en <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>; si vence, usa "¿Olvidaste tu contraseña?" en la pantalla de ingreso.

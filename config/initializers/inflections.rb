@@ -20,3 +20,11 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.irregular "solicitud", "solicitudes"
   inflect.irregular "proximo_ingreso", "proximos_ingresos"
 end
+
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.irregular "empresa", "empresas"
+  inflect.irregular "registro_auditoria", "registros_auditoria"
+  inflect.irregular "importacion", "importaciones"
+  inflect.irregular "verificacion", "verificaciones"
+  inflect.irregular "cuenta", "cuentas"
+end

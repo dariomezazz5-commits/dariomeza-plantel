@@ -1,6 +1,23 @@
 vacaciones_valentina:
+  empresa: andes
   colaborador: valentina
   tipo: Vacaciones
   desde: 2026-11-09
   hasta: 2026-11-13
+  estado: Pendiente
+
+permiso_matias:
+  empresa: andes
+  colaborador: matias
+  tipo: Permiso administrativo
+  desde: 2026-11-12
+  hasta: 2026-11-12
+  estado: Pendiente
+
+vacaciones_rosa:
+  empresa: austral
+  colaborador: rosa
+  tipo: Vacaciones
+  desde: 2026-11-16
+  hasta: 2026-11-20
   estado: Pendiente

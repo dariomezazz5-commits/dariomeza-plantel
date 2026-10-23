@@ -1,0 +1,52 @@
+<div class="page page-22">
+  <header class="page-header">
+    <div class="overline"><%= link_to "Colaboradores", colaboradores_path %></div>
+    <h1>Importar colaboradores</h1>
+  </header>
+
+  <% if @resultado&.errores&.any? %>
+    <div class="flash flash-alert" role="alert">
+      <strong>No se importó nada.</strong> Corrige estas filas y vuelve a subir el archivo:
+      <ul>
+        <% @resultado.errores.first(30).each do |fila, msg| %>
+          <li><%= fila.positive? ? "Fila #{fila}: " : "" %><%= msg %></li>
+        <% end %>
+        <% if @resultado.errores.size > 30 %><li>…y <%= @resultado.errores.size - 30 %> errores más.</li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <section class="blueprint panel panel-narrow">
+    <%= esquinas %>
+    <h3>1. Prepara el archivo</h3>
+    <p class="text">Usa un Excel (.xlsx) o CSV con una fila por persona. La primera fila debe tener estos encabezados:</p>
+    <div class="table-scroll">
+      <table class="table table-compact">
+        <thead><tr><th>Columna</th><th>Obligatoria</th><th>Ejemplo</th></tr></thead>
+        <tbody>
+          <% [ [ "nombre", true, "Valentina Muñoz Díaz" ], [ "rut", true, "17.445.208-3" ], [ "email", true, "vmunoz@empresa.cl" ],
+               [ "cargo", true, "Ingeniera de Procesos" ], [ "area", true, "Operaciones" ], [ "sede", true, "Concepción" ],
+               [ "fecha_ingreso", true, "13-01-2020" ], [ "contrato", false, "Indefinido · Plazo fijo · Por obra o faena" ],
+               [ "estado", false, "Activo · Vacaciones · Licencia médica" ], [ "saldo_vacaciones", false, "17" ],
+               [ "rut_jefatura", false, "15.671.330-9" ] ].each do |col, oblig, ej| %>
+            <tr><td><code><%= col %></code></td><td><%= oblig ? "Sí" : "No" %></td><td><%= ej %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <p class="meta">Si un RUT ya existe se actualizan sus datos; si no, se crea la persona. La importación es todo o nada: si una fila tiene un error, no se guarda ninguna.</p>
+    <%= link_to plantilla_importaciones_path, class: "btn btn-secondary", data: { turbo: false } do %>Descargar plantilla (.csv)<% end %>
+  </section>
+
+  <section class="blueprint panel panel-narrow">
+    <%= esquinas %>
+    <h3>2. Súbelo</h3>
+    <%= form_with url: importaciones_path, multipart: true, class: "form-inline", data: { turbo: false } do |f| %>
+      <div class="field">
+        <%= f.label :archivo, "Archivo .xlsx o .csv" %>
+        <%= f.file_field :archivo, accept: ".xlsx,.csv", required: true, class: "input" %>
+      </div>
+      <%= f.submit "Importar", class: "btn btn-primary" %>
+    <% end %>
+  </section>
+</div>

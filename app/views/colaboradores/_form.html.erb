@@ -1,0 +1,73 @@
+<%= form_with model: colaborador, class: "page page-22" do |f| %>
+  <header class="page-header page-header-split">
+    <div class="page-header-text">
+      <div class="overline"><%= link_to "Colaboradores", colaboradores_path %></div>
+      <h1><%= colaborador.new_record? ? "Nuevo colaborador" : colaborador.nombre %></h1>
+    </div>
+  </header>
+
+  <% if colaborador.errors.any? %>
+    <div class="flash flash-alert" role="alert">
+      <strong>Revisa estos datos:</strong>
+      <ul><% colaborador.errors.full_messages.each do |m| %><li><%= m %></li><% end %></ul>
+    </div>
+  <% end %>
+
+  <section class="blueprint panel panel-form">
+    <%= esquinas %>
+    <h3>Datos personales</h3>
+    <div class="form-grid">
+      <div class="field span-2"><%= f.label :nombre, "Nombre completo" %><%= f.text_field :nombre, class: "input", required: true %></div>
+      <div class="field"><%= f.label :rut, "RUT" %><%= f.text_field :rut, class: "input", required: true, placeholder: "12.345.678-9" %></div>
+      <div class="field"><%= f.label :email, "Correo laboral" %><%= f.email_field :email, class: "input", required: true %></div>
+    </div>
+  </section>
+
+  <section class="blueprint panel panel-form">
+    <%= esquinas %>
+    <h3>Puesto</h3>
+    <div class="form-grid">
+      <div class="field"><%= f.label :cargo, "Cargo" %><%= f.text_field :cargo, class: "input", required: true %></div>
+      <div class="field">
+        <%= f.label :area, "Área" %>
+        <%= f.text_field :area, class: "input", required: true, list: "areas-existentes" %>
+        <datalist id="areas-existentes"><% Current.user.empresa.areas.each do |a| %><option value="<%= a %>"></option><% end %></datalist>
+      </div>
+      <div class="field"><%= f.label :sede, "Sede" %><%= f.text_field :sede, class: "input", required: true %></div>
+      <div class="field">
+        <%= f.label :jefe_id, "Jefatura directa" %>
+        <%= f.collection_select :jefe_id, Colaborador.where.not(id: colaborador.id).order(:nombre), :id, :nombre,
+              { include_blank: "Gerencia General (sin jefatura)" }, class: "input" %>
+      </div>
+      <div class="field"><%= f.label :ingreso, "Fecha de ingreso" %><%= f.date_field :ingreso, class: "input", required: true %></div>
+      <div class="field"><%= f.label :contrato, "Contrato" %><%= f.select :contrato, Colaborador::CONTRATOS, {}, class: "input" %></div>
+      <div class="field"><%= f.label :estado, "Estado" %><%= f.select :estado, Colaborador::ESTADOS, {}, class: "input" %></div>
+      <div class="field"><%= f.label :saldo_vacaciones, "Saldo de vacaciones (días)" %><%= f.number_field :saldo_vacaciones, class: "input", step: 1 %></div>
+    </div>
+  </section>
+
+  <section class="blueprint panel panel-form">
+    <%= esquinas %>
+    <h3>Acceso a Plantel</h3>
+    <% user = colaborador.user %>
+    <% if user %>
+      <p class="text">Tiene acceso con el correo <strong><%= user.email_address %></strong>.</p>
+      <%= hidden_field_tag "acceso[habilitar]", "1" %>
+    <% else %>
+      <label class="check">
+        <%= check_box_tag "acceso[habilitar]", "1", params.dig(:acceso, :habilitar) == "1" %>
+        Darle acceso y enviarle una invitación por correo para que elija su contraseña
+      </label>
+    <% end %>
+    <div class="field field-narrow">
+      <%= label_tag "acceso_rol", "Rol" %>
+      <%= select_tag "acceso[rol]", options_for_select(User::ROLES.invert, params.dig(:acceso, :rol) || user&.rol || "colaborador"), class: "input", id: "acceso_rol" %>
+    </div>
+    <p class="meta">Colaborador: ve su ficha y pide sus ausencias. Jefatura: además aprueba las de su equipo directo. Administrador de RR.HH.: ve y administra toda la empresa.</p>
+  </section>
+
+  <div class="form-actions">
+    <%= link_to "Cancelar", colaboradores_path, class: "btn btn-secondary" %>
+    <%= f.submit colaborador.new_record? ? "Crear colaborador" : "Guardar cambios", class: "btn btn-primary" %>
+  </div>
+<% end %>

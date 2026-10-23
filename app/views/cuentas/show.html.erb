@@ -1,0 +1,42 @@
+<div class="page page-22">
+  <header class="page-header">
+    <div class="overline"><%= @user.email_address %> · <%= @user.rol_legible %></div>
+    <h1>Mi cuenta</h1>
+  </header>
+
+  <section class="blueprint panel panel-narrow">
+    <%= esquinas %>
+    <h3>Verificación en dos pasos</h3>
+    <% if @user.dos_pasos_activo? %>
+      <p class="text">Activa desde el <%= l(@user.otp_activado_en.to_date, format: :corto) %>. Al ingresar te pediremos tu contraseña y un código de tu app autenticadora.</p>
+      <%= form_with url: desactivar_dos_pasos_cuenta_path, method: :delete, class: "form-inline" do |f| %>
+        <div class="field">
+          <%= f.label :password, "Tu contraseña, para confirmar" %>
+          <%= f.password_field :password, required: true, autocomplete: "current-password", class: "input" %>
+        </div>
+        <%= f.submit "Desactivar", class: "btn btn-secondary" %>
+      <% end %>
+    <% else %>
+      <p class="text">Agrega una capa de seguridad: además de la contraseña, al ingresar te pediremos un código que cambia cada 30 segundos.</p>
+      <ol class="steps">
+        <li>Instala una app autenticadora en tu teléfono (Google Authenticator, Microsoft Authenticator o 1Password).</li>
+        <li>Escanea este código QR con la app.</li>
+        <li>Escribe el código de 6 dígitos que aparece.</li>
+      </ol>
+      <div class="otp-setup">
+        <div class="qr"><%= @qr.html_safe %></div>
+        <div class="otp-side">
+          <p class="meta">¿No puedes escanear? Ingresa esta clave a mano:</p>
+          <code class="otp-secret"><%= @secret.scan(/.{1,4}/).join(" ") %></code>
+          <%= form_with url: activar_dos_pasos_cuenta_path, class: "form-inline" do |f| %>
+            <div class="field">
+              <%= f.label :codigo, "Código" %>
+              <%= f.text_field :codigo, required: true, autocomplete: "one-time-code", inputmode: "numeric", maxlength: 7, class: "input input-code" %>
+            </div>
+            <%= f.submit "Activar", class: "btn btn-primary" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </section>
+</div>

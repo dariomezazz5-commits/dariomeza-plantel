@@ -1,0 +1,13 @@
+<h1 class="auth-title">Ingresar</h1>
+<%= form_with url: session_path, class: "form-stack" do |form| %>
+  <div class="field">
+    <%= form.label :email_address, "Correo" %>
+    <%= form.email_field :email_address, required: true, autofocus: params[:email_address].blank?, autocomplete: "username", value: params[:email_address], class: "input" %>
+  </div>
+  <div class="field">
+    <%= form.label :password, "Contraseña" %>
+    <%= form.password_field :password, required: true, autofocus: params[:email_address].present?, autocomplete: "current-password", maxlength: 72, class: "input" %>
+  </div>
+  <%= form.submit "Ingresar", class: "btn btn-primary btn-block" %>
+<% end %>
+<%= link_to "¿Olvidaste tu contraseña?", new_password_path, class: "auth-link" %>

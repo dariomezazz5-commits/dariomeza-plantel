@@ -4,21 +4,22 @@ class SolicitudesController < ApplicationController
   before_action :set_solicitud, only: %i[aprobar rechazar deshacer]
 
   def index
-    @tab = TABS.include?(params[:tab]) ? params[:tab] : "pend"
-    @nueva_solicitud = Solicitud.nueva_con_defaults if params[:nueva]
+    @tab = TABS.include?(params[:tab]) ? params[:tab] : default_tab
+    @nueva_solicitud = nueva_solicitud if params[:nueva]
     cargar_lista
   end
 
   # Se muestra como diálogo dentro del turbo-frame "modal" de la página de Ausencias.
   def new
     return redirect_to(ausencias_path(nueva: 1)) unless turbo_frame_request?
-    @nueva_solicitud = Solicitud.nueva_con_defaults
+    @nueva_solicitud = nueva_solicitud
   end
 
   def create
-    @nueva_solicitud = Solicitud.new(solicitud_params.merge(estado: "Pendiente"))
+    @nueva_solicitud = Solicitud.new(solicitud_params.merge(estado: "Pendiente", creada_por: usuario_actual))
+    @nueva_solicitud.colaborador = nil unless usuario_actual.puede_solicitar_para?(@nueva_solicitud.colaborador)
     if @nueva_solicitud.save
-      redirect_to ausencias_path(tab: "pend"), status: :see_other
+      redirect_to ausencias_path(tab: "pend"), status: :see_other, notice: "Solicitud creada. Avisamos por correo a quien debe aprobarla."
     else
       @tab = "pend"
       cargar_lista
@@ -27,40 +28,52 @@ class SolicitudesController < ApplicationController
   end
 
   def aprobar
-    @solicitud.aprobar!
+    autorizar!(usuario_actual.puede_aprobar?(@solicitud))
+    @solicitud.aprobar!(por: usuario_actual)
     recordar_resuelta
     volver
   end
 
   def rechazar
-    @solicitud.rechazar!
+    autorizar!(usuario_actual.puede_aprobar?(@solicitud))
+    @solicitud.rechazar!(por: usuario_actual)
     recordar_resuelta
     volver
   end
 
   def deshacer
-    @solicitud.deshacer!
+    autorizar!(usuario_actual.puede_aprobar?(@solicitud) && resueltas_en_sesion.include?(@solicitud.id))
+    @solicitud.deshacer!(por: usuario_actual)
     resueltas_en_sesion.delete(@solicitud.id)
     volver
   end
 
   private
     def set_solicitud
-      @solicitud = Solicitud.find(params[:id])
+      @solicitud = usuario_actual.solicitudes_visibles.find(params[:id])
     end
 
     def solicitud_params
       params.expect(solicitud: %i[colaborador_id tipo desde hasta])
     end
 
+    def default_tab = usuario_actual.colaborador? ? "all" : "pend"
+
+    def nueva_solicitud
+      propio = usuario_actual.colaborador if usuario_actual.colaborador?
+      Solicitud.nueva_con_defaults(colaborador: propio)
+    end
+
     def cargar_lista
-      base = Solicitud.includes(:colaborador).order(:id)
+      base = usuario_actual.solicitudes_visibles.includes(:colaborador, :resuelta_por).order(:desde, :id)
       @solicitudes = case @tab
       when "pend" then base.pendientes
       when "done" then base.resueltas
       else base
       end
+      @aprobables = usuario_actual.solicitudes_aprobables.pluck(:id).to_set
       @resueltas_en_sesion = resueltas_en_sesion
+      @colaboradores_para_solicitud = usuario_actual.colaboradores_visibles.order(:nombre)
     end
 
     # "Deshacer" solo se ofrece para solicitudes resueltas en esta sesión (como en el prototipo).

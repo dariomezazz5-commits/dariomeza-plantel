@@ -20,34 +20,53 @@
   </head>
 
   <body>
+    <% u = usuario_actual %>
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand">
           <div class="brand-name">Plantel</div>
-          <div class="brand-sub">Industrias Andes SpA</div>
+          <div class="brand-sub"><%= u.empresa.nombre %></div>
         </div>
         <nav class="nav">
-          <%= nav_item "Inicio", root_path, :house, activo: controller_name == "inicio" %>
-          <%= nav_item "Colaboradores", colaboradores_path, :users, activo: controller_name == "colaboradores" %>
-          <%= nav_item "Ausencias", ausencias_path, :calendar, activo: controller_name == "solicitudes" do %>
+          <% unless u.colaborador? %>
+            <%= nav_item "Inicio", root_path, :house, activo: controller_name == "inicio" %>
+            <%= nav_item (u.jefatura? ? "Mi equipo" : "Colaboradores"), colaboradores_path, :users, activo: %w[colaboradores importaciones].include?(controller_name) %>
+          <% end %>
+          <%= nav_item (u.colaborador? ? "Mis ausencias" : "Ausencias"), ausencias_path, :calendar, activo: controller_name == "solicitudes" do %>
             <% if pendientes_count > 0 %><span class="nav-badge"><%= pendientes_count %></span><% end %>
+          <% end %>
+          <% if u.colaborador %>
+            <%= link_to colaborador_path(u.colaborador), class: "nav-item", data: { turbo_frame: "drawer" } do %>
+              <%= icono :id_card %><span class="nav-label">Mi ficha</span>
+            <% end %>
+          <% end %>
+          <% if u.admin? %>
+            <%= nav_item "Auditoría", auditoria_path, :list, activo: controller_name == "auditoria" %>
           <% end %>
         </nav>
         <div class="sidebar-user">
-          <span class="avatar avatar-user"><%= usuario_actual&.iniciales %></span>
-          <div class="sidebar-user-text">
-            <span><%= usuario_actual&.nombre_corto %></span>
-            <span class="muted-accent"><%= usuario_actual&.cargo %></span>
-          </div>
+          <%= link_to cuenta_path, class: "sidebar-user-link", title: "Mi cuenta" do %>
+            <span class="avatar avatar-user"><%= u.iniciales %></span>
+            <span class="sidebar-user-text">
+              <span><%= u.nombre %></span>
+              <span class="muted-accent"><%= u.cargo %></span>
+            </span>
+          <% end %>
+          <%= button_to session_path, method: :delete, class: "btn-logout", title: "Cerrar sesión", "aria-label": "Cerrar sesión", form_class: "inline-form" do %>
+            <%= icono :logout %>
+          <% end %>
         </div>
       </aside>
 
       <main class="main">
+        <%= render "shared/flash" %>
         <%= yield %>
       </main>
     </div>
 
     <%# Ficha lateral de colaborador: los enlaces con data-turbo-frame="drawer" cargan colaboradores#show aquí. %>
-    <%= turbo_frame_tag "drawer", src: (colaborador_path(params[:ficha]) if params[:ficha].present?) %>
+    <%= turbo_frame_tag "drawer" do %>
+      <%= render "colaboradores/ficha", colaborador: @ficha if @ficha %>
+    <% end %>
   </body>
 </html>

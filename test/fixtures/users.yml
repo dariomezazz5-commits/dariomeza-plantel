@@ -1,0 +1,29 @@
+<% clave = BCrypt::Password.create("clave-de-prueba-1") %>
+
+camila:
+  empresa: andes
+  colaborador: camila
+  email_address: camila@industriasandes.cl
+  password_digest: <%= clave %>
+  rol: admin
+
+benjamin:
+  empresa: andes
+  colaborador: benjamin
+  email_address: benjamin@industriasandes.cl
+  password_digest: <%= clave %>
+  rol: jefatura
+
+valentina:
+  empresa: andes
+  colaborador: valentina
+  email_address: valentina@industriasandes.cl
+  password_digest: <%= clave %>
+  rol: colaborador
+
+rosa:
+  empresa: austral
+  colaborador: rosa
+  email_address: admin@australsur.cl
+  password_digest: <%= clave %>
+  rol: admin

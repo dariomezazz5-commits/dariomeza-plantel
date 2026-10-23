@@ -1,0 +1,5 @@
+<p>Hola,</p>
+<p><strong><%= @solicitud.colaborador.nombre %></strong> pidió <strong><%= @solicitud.tipo.downcase %></strong>
+del <%= l(@solicitud.desde, format: :corto) %> al <%= l(@solicitud.hasta, format: :corto) %>
+(<%= DiasHabiles.etiqueta(@solicitud.dias_habiles) %>).</p>
+<p><%= link_to "Revisar solicitudes por aprobar", ausencias_url(tab: "pend") %></p>
